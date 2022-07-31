@@ -1,5 +1,11 @@
 services: 
 
+  backend_shell: 
+    container_name: backend_shell 
+    build: ./backend 
+    entrypoint: bash -c 
+    profiles: ["backend"]
+
   backend: 
     container_name: backend 
     build: ./backend 
