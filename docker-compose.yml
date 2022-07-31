@@ -12,3 +12,12 @@ services:
     profiles: ["backend"]
     ports: 
     - "5000:5000"
+
+  dynamo_db: 
+    container_name: dynamo_db
+    image: localstack/localstack
+    environment: 
+      - SERVICES=dynamo_db
+      - DEFAULT_REGION=us-east-1
+    ports: 
+      - "5010:4566"
