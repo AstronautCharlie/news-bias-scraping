@@ -4,6 +4,12 @@ build-backend:
 run-backend: 
 	docker-compose --profile backend up 
 
+build-dynamodb:
+	docker-compose --profile dynamo_db build 
+
+run-dynamodb: 
+	docker-compose --profile dynamo_db up 
+
 clean: 
 	docker-compose down --remove-orphans
 
