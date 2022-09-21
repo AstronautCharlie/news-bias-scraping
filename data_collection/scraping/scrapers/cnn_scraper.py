@@ -25,6 +25,9 @@ class CnnScraper(BaseScraper):
         super(CnnScraper, self).__init__(selenium_endpoint=selenium_endpoint)
         self._selenium_endpoint = selenium_endpoint
 
+    def run(self):
+        return self.scrape_stories_from_homepage
+
     def scrape_stories_from_homepage(self):
         """
         Scrape stories from the CNN homepage.

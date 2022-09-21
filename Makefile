@@ -12,7 +12,7 @@ build-dynamodb:
 run-dynamodb: 
 	docker-compose --profile dynamo_db up 
 
-build-data:
+build-data: # selenium and scraper
 	docker-compose --profile data build
 
 run-data:
@@ -31,3 +31,6 @@ clean:
 
 test: clean
 	docker-compose run --rm backend_shell 'python3.9 -m pytest'
+
+run-sandbox: 
+	docker-compose up -d sandbox

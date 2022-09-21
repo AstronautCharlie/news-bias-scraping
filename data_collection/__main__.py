@@ -8,12 +8,11 @@ logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
-
 if __name__ == '__main__':
     sleep(10)
     scraper = CnnScraper()
-    rendered_html = scraper.
-    print(scraper.soup.prettify())
+    rendered_html = scraper.run()
+    logger.info(rendered_html)
     sleep(600) 
     #app = ScraperApp()
     #app.run()
