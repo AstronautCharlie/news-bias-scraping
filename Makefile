@@ -1,3 +1,5 @@
+# Runs and Builds
+
 build-backend: 
 	docker-compose --profile backend build 
 
@@ -9,6 +11,20 @@ build-dynamodb:
 
 run-dynamodb: 
 	docker-compose --profile dynamo_db up 
+
+build-data:
+	docker-compose --profile data build
+
+run-data:
+	docker-compose --profile data up
+
+build-selenium:
+	docker-compose build -d selenium
+
+run-selenium:
+	docker-compose up -d selenium
+
+# Utility
 
 clean: 
 	docker-compose down --remove-orphans

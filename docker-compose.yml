@@ -1,7 +1,7 @@
 services: 
 
-  backend_shell: 
-    container_name: backend_shell 
+  backend-shell: 
+    container_name: backend-shell 
     build: ./backend 
     entrypoint: bash -c 
     profiles: ["backend"]
@@ -21,6 +21,22 @@ services:
     volumes: 
       - .:/code
       - C:\Users\trevo\.aws\credentials:/app/.aws/credentials:ro
+  
+  data-collection:
+    container_name: data-collection
+    build: ./data_collection
+    profiles: ["data"]
+    ports: 
+      - "5002:5000"
+    depends_on: 
+      - selenium
+  
+  selenium:
+    container_name: selenium
+    image: selenium/standalone-chrome
+    profiles: ["data"]
+    ports: 
+    - "4444:4444"
 
   # dynamo_db: 
   #   container_name: dynamo_db
