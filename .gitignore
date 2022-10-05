@@ -1,2 +1,5 @@
 news-bias
 secrets.txt
+*/__pycache__
+*/*/__pycache__
+*/*/*/__pycache__

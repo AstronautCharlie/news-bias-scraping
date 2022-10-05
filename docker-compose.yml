@@ -37,6 +37,8 @@ services:
     profiles: ["data"]
     ports: 
     - "4444:4444"
+    logging:
+      driver: none
   
   sandbox:
     container_name: sandbox

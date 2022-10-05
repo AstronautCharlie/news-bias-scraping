@@ -2,10 +2,24 @@ from time import sleep
 from selenium import webdriver
 from settings import ScraperConfig
 
+import logging 
+import requests
+
+logger = logging.getLogger(__name__)
+
 class BaseScraper:
-    def __init__(self, selenium_endpoint=ScraperConfig.SELENIUM_ENDPOINT):
+    def __init__(self, selenium_endpoint=None):
+        if selenium_endpoint is None: 
+            logger.error('SELENIUM_ENDPOINT argument not provided to Base Scraper')
         self._selenium_endpoint = selenium_endpoint
-        self._driver = self._initialize_selenium_webdriver()
+    """
+    @property
+    def driver(self):
+        return self._driver
+    """
+    @property
+    def selenium_endpoint(self):
+        return self._selenium_endpoint
 
     def _initialize_selenium_webdriver(self):
         """
@@ -21,10 +35,22 @@ class BaseScraper:
 
     def scrape_rendered_html(self, url):
         """
-        Scrape the rendered html from the specified url
+        Uses Selenium
         """
-        self._driver.get(url)
-        return self._driver.page_source
+        driver = self._initialize_selenium_webdriver()
+        driver.get(url)
+        html = str(driver.page_source)
+        driver.quit()
+        return html
+    
+    def scrape_static_html(self, url):
+        """
+        Uses Requests
+        """
+        response = requests.get(url)
+        html = response.text
+        return html
+
 
         # Set options for webdriver 
         #options = webdriver.ChromeOptions()

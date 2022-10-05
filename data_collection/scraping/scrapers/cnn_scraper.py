@@ -21,12 +21,23 @@ from settings import ScraperConfig
 logger = logging.getLogger(__name__)
 
 class CnnScraper(BaseScraper): 
-    def __init__(self, selenium_endpoint=ScraperConfig.SELENIUM_ENDPOINT):
+    def __init__(self, selenium_endpoint=None):
+        if selenium_endpoint is None: 
+            logger.error(f'$SELENIUM_ENDPOINT argument not provided')
         super(CnnScraper, self).__init__(selenium_endpoint=selenium_endpoint)
         self._selenium_endpoint = selenium_endpoint
 
     def run(self):
-        return self.scrape_stories_from_homepage
+        homepage_stories = self.scrape_stories_from_homepage()
+        logger.info('Scraped hompage for stories:')
+        for story in homepage_stories: 
+            logger.info(f'\n{story}')
+        logger.info(f'Quitting')
+        quit()
+        stories = self.scrape_stories_from_homepage()
+
+        for story in stories: 
+            logger.info(f'\n\n{story}\n\n')
 
     def scrape_stories_from_homepage(self):
         """
@@ -56,17 +67,19 @@ class CnnScraper(BaseScraper):
         stories = [] 
         
         for section in homepage_sections: 
-            partial_stories = self.scrape_url_link_headline(html, section)
-            story = self.populate_article_text_headline_from_url(partial_stories)
-            stories.append(story)
+            partial_stories = self.scrape_urllink_headlines(html, section)
+            stories = [] 
+            for partial_story in partial_stories: 
+                story = self.populate_articletext_headline_from_url(partial_story)
+                stories.append(story)
 
         return stories 
 
-    def scrape_url_link_headline(self, 
+    def scrape_urllink_headlines(self, 
                         page_html,
                         class_name, 
                         html_type='section',
-                        exclude_empty_headlines=True):
+                        include_empty_headlines=False):
         """
         Get url and link_headline for all homepage Stories
 
@@ -81,13 +94,23 @@ class CnnScraper(BaseScraper):
         for l in links: 
             link_headline = l.getText()
             url = l.get('href')
-            if (link_headline != '') or exclude_empty_headlines:
-                new_story = Story(link_headline=link_headline, url=url)
+            if (link_headline != '') or include_empty_headlines:
+                full_url = self._fill_partial_headline(url)
+                new_story = Story(link_headline=link_headline, url=full_url)
                 stories.append(new_story)
         
         return stories
     
-    def populate_article_text_headline_from_url(self, story):
+    def _fill_partial_headline(self, url):
+        """
+        If `url` doesn't start with 'http(s)://www.cnn.com', append it
+        """
+        if not url.startswith('http://www.cnn.com') and not url.startswith('https://www.cnn.com'):
+            return 'https://www.cnn.com' + url
+        else: 
+            return url
+    
+    def populate_articletext_headline_from_url(self, story):
         """
         Populate article_text and article_headline fields of Story from url field
 
@@ -97,22 +120,39 @@ class CnnScraper(BaseScraper):
             logging.error('Story url is undefined - cannot populate article')
             return story
         
-        article_headline, article_text = self._scrape_article_headline_text_from_url(story.url)
+        article_headline, article_text = self.scrape_articleheadline_text_from_url(story.url)
         story.article_headline = article_headline
         story.article_text = article_text
         
         return story 
 
-    def _scrape_article_headline_text_from_url(self, url):
+    def scrape_articleheadline_text_from_url(self, url):
         """
         Returns string (headline), string(article_text)
         """
-        html = self.driver.get(url)
-        soup = BS(html)
-        article_headline = soup.find('h1', {'class': 'pg-headline'}).getText()
-        article_text = soup.find('section', {'class': 'zn-body-text'}).getText()
+        logger.info(f'_scrape_article_headline_text_from_url w/ url={url}')
+        # At time of writing, CNN story articles are static
+        html = self.scrape_static_html(url)
+        article_headline = self._find_articleheadline_in_page_html(html)#soup.find('h1', {'class': 'pg-headline'}).getText()
+        article_text = self._find_articletext_in_page_html(html)#soup.find('section', {'class': 'zn-body-text'}).getText()
         
         return article_headline, article_text
+    
+    def _find_articleheadline_in_page_html(self, html):
+        soup = BS(html)
+        headline_text = soup.find('h1', {"class": "headline__text"}).getText()
+        return headline_text
+    
+    def _find_articletext_in_page_html(self, html):
+        soup = BS(html)
+        paragraph_html_tags = soup.find_all('p')
+        story_text = [] 
+        for tag in paragraph_html_tags: 
+            # At time of writing, all `p` elements with `paragraph` class are part of the story
+            if 'paragraph' in tag.get('class'):
+                story_text.append(tag.getText())
+        full_text = ''.join(story_text) 
+        return full_text
 
 # class CnnScraper(): 
 #     """

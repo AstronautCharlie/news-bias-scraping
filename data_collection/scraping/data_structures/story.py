@@ -54,3 +54,9 @@ class Story:
     def date(self, value):
         self._date = value
 
+    def __str__(self): 
+        return f'url: {self._url}'\
+            f'link_headline: {self._link_headline}'\
+            f'article_headline: {self._article_headline}'\
+            f'article_text: {self._article_text[50]}...'\
+            f'date: {self._date}'

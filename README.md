@@ -18,3 +18,12 @@ make run-backend
 
 ## Need More Docs? 
 See READMEs in subfolders
+
+
+## Trouble Shooting
+- Is Docker Desktop Up? If you see this, maybe not:
+```
+ConnectionRefusedError: [WinError 10061] No connection could be made because the target machine actively
+refused it
+```
+- Is Selenium running? Is the Docker Container up? 
