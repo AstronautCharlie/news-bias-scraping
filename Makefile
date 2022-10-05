@@ -32,5 +32,8 @@ clean:
 test: clean
 	docker-compose run --rm backend_shell 'python3.9 -m pytest'
 
+build-sandbox: 
+	docker-compose build sandbox
+
 run-sandbox: 
-	docker-compose up -d sandbox
+	docker-compose up sandbox
