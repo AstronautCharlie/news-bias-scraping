@@ -3,3 +3,8 @@ secrets.txt
 */__pycache__
 */*/__pycache__
 */*/*/__pycache__
+data_collection/__pycache__
+data_collection/scraping/scrapers/__pycache__
+sandbox
+
+__pycache__

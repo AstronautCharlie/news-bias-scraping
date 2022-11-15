@@ -7,7 +7,7 @@ import logging
 import argparse
 from settings import AppConfig
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('utils')
 
 def set_env_var_defaults():
     """
@@ -15,6 +15,7 @@ def set_env_var_defaults():
     """
     for env_var_name, env_var_val in AppConfig.ENVIRONMENT_VARIABLE_DEFAULTS.items():
         os.environ[env_var_name] = env_var_val 
+        logger.info(f'setting env var {env_var_name} to {env_var_val} == {os.environ[env_var_name]}')
 
 def parse_cmd_line_args_to_env_vars():
     """

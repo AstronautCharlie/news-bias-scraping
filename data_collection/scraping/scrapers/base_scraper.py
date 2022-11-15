@@ -1,6 +1,6 @@
 from time import sleep
 from selenium import webdriver
-from settings import ScraperConfig
+from settings import CnnScraperConfig
 
 import logging 
 import requests
@@ -45,25 +45,15 @@ class BaseScraper:
     
     def scrape_static_html(self, url):
         """
-        Uses Requests
+        Scrapes html using `requests` package - returns None if operation fails
         """
-        response = requests.get(url)
+        try:
+            response = requests.get(url)
+        except ConnectionError as err: 
+            logger.warning(f'requests.get(url) failed to connect with url={url}')
+            return None
+        except Exception as err:
+            logger.error(f'requests.get(url) failed with url={url}\nerr={err}')
+            return None
         html = response.text
         return html
-
-
-        # Set options for webdriver 
-        #options = webdriver.ChromeOptions()
-        #options.add_argument('--headless')
-        #options.add_argument('--no-sandbox')
-        #options.add_argument('--disable-dev-shm-usage')
-
-        #driver = webdriver.Remote(ScraperConfig.SELENIUM_ENDPOINT, options=options)
-
-        # Fetch and render page, waiting in case rendering takes a moment
-        # driver.get(url)
-        # sleep(5)
-        # rendered_html = driver.page_source 
-        # driver.quit()
-        # return rendered_html
-        

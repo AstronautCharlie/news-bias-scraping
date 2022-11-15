@@ -12,8 +12,6 @@ services:
     profiles: ["backend"]
     ports: 
     - "5000:5000"
-    networks: 
-      - bias-network
     environment: 
       - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY
       - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
@@ -28,9 +26,61 @@ services:
     profiles: ["data"]
     ports: 
       - "5002:5000"
+    environment:
+      - AWS_ACCESS_KEY_ID=abc
+      - AWS_SECRET_ACCESS_KEY=xyz
+      - AWS_DEFAULT_REGION=us-east-2
     depends_on: 
       - selenium
+      - localstack-dynamodb
+
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    profiles: ["dynamodb", "data"]
+    ports:
+      - "5100:5100"
+    environment:
+      DYNAMO_ENDPOINT: "http://localstack-dynamodb:4566"
+      AWS_REGION: us-east-2
+      AWS_ACCESS_KEY_ID: abc
+      AWS_SECRET_ACCESS_KEY: xyz
+      PORT: 5100
+    depends_on:
+      - localstack-dynamodb
   
+  localstack-dynamodb:
+    container_name: "localstack-dynamodb"
+    profiles: ["dynamodb", "data"]
+    image: localstack/localstack
+    ports: 
+      - "4566:4566"
+    environment:
+      SERVICES: dynamodb
+      AWS_ACCESS_KEY_ID: abc
+      AWS_SECRET_ACCESS_KEY: xyz
+      AWS_REGION: us-east-2
+  
+  setup-resources:
+    container_name: setup-resources
+    image: amazon/aws-cli
+    profiles: ["dynamodb", "data", "setup"]
+    entrypoint: /bin/sh -c
+    environment:
+      AWS_REGION: us-east-2
+      AWS_ACCESS_KEY_ID: abc
+      AWS_SECRET_ACCESS_KEY: xyz
+    command: >
+      "
+        sleep 10
+        cd /setup_resources
+        ./create_story_table.sh > /dev/null && \
+        echo AWS resources created!
+      "
+    depends_on:
+     - localstack-dynamodb
+    volumes:
+      - ./data_collection/setup_resources:/setup_resources
+
   selenium:
     container_name: selenium
     image: selenium/standalone-chrome
@@ -40,11 +90,11 @@ services:
     logging:
       driver: none
   
-  sandbox:
-    container_name: sandbox
-    build: ./sandbox
-    profiles: ["sandbox"]
+  # sandbox:
+  #   container_name: sandbox
+  #   build: ./sandbox
+  #   profiles: ["sandbox"]
 
-networks: 
-  bias-network:
-    name: bias-network 
+# networks: 
+#   bias-network:
+#     name: bias-network 

@@ -5,15 +5,19 @@ import argparse
 import logging
 
 class AppConfig:
-    ENVIRONMENT_VARIABLE_DEFAULTS = {
-        """
-        These should be settable by `utils.parse_cmd_line_args_to_env_vars()`
-        """
-        # `selenium` is for Docker Container
-        'SELENIUM_ENDPOINT': 'http://selenium:4444/wd/hub'
-    }
+    SELENIUM_ENDPOINT = 'http://selenium:4444/wd/hub'
 
     LOGGING_LEVEL = logging.INFO
+
+class DynamoConfig:
+    DYNAMO_ENDPOINT = 'http://localhost:4566'
+    TABLE_NAME = 'stories'
     
-class ScraperConfig: 
+class CnnScraperConfig: 
     CNN_HOMEPAGE = 'https://www.cnn.com'
+    CNN_HOMEPAGE_SECTIONS = [
+        #'zn-homepage-injection-zone-1', # Ticker at top
+        'zn-homepage1-zone-1',
+        #'zn-homepage2-zone-1',
+        #'zn-homepage2-zone-2', 
+    ]
