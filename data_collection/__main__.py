@@ -1,14 +1,12 @@
 import logging
 from time import sleep
-#from scraping.scraper_app import ScraperApp
-from scraping.scrapers.cnn_scraper import CnnScraper
+from scraping.app import App
 from settings import AppConfig
 
 logging.basicConfig(level=AppConfig.LOGGING_LEVEL)
 logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
-    sleep(5)
-    scraper = CnnScraper()
-    scraper.run()
-    
+    sleep(5) # For startup - otherwise this crashes
+    app = App()
+    app.run()    

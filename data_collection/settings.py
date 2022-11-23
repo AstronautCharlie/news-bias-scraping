@@ -10,14 +10,14 @@ class AppConfig:
     LOGGING_LEVEL = logging.INFO
 
 class DynamoConfig:
-    DYNAMO_ENDPOINT = 'http://localhost:4566'
+    DYNAMO_ENDPOINT = 'http://localstack-dynamodb:4566'
     TABLE_NAME = 'stories'
     
 class CnnScraperConfig: 
     CNN_HOMEPAGE = 'https://www.cnn.com'
     CNN_HOMEPAGE_SECTIONS = [
-        #'zn-homepage-injection-zone-1', # Ticker at top
+        'zn-homepage-injection-zone-1', # Ticker at top
         'zn-homepage1-zone-1',
-        #'zn-homepage2-zone-1',
-        #'zn-homepage2-zone-2', 
+        'zn-homepage2-zone-1',
+        'zn-homepage2-zone-2', 
     ]

@@ -21,4 +21,16 @@ class Story:
         return self.__dict__
 
     def __str__(self):
-        return str(self.dump())
+        if len(self.article_text) == 0: 
+            article_snippet = ''
+        else:
+            article_snippet = self.article_text[:(min(50, len(self.article_text)))]
+
+        string_rep = f'{"url:".ljust(20)}{self.url}\n\
+            {"link headline:".ljust(20)}{self.link_headline}\n\
+            {"article headline:".ljust(20)}{self.article_headline}\n\
+            {"article_text:".ljust(20)}{article_snippet}\n\
+            {"date:".ljust(20)}{self.date}\n\
+            {"source:".ljust(20)}{self.source}\n'
+        
+        return string_rep

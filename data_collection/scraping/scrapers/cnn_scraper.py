@@ -1,6 +1,7 @@
 """
 TODO: 
-- Add opinion/analysis tagging 
+- Add scraping for live update stories - currently they are ignored
+- Add scrpaing for '/opinion', '/world', '/politics', '/us'
 
 NOTE: 
 - If using selenium to get html, refer to following StackOverflow: 
@@ -8,10 +9,8 @@ https://stackoverflow.com/questions/47060735/selenium-remote-webdriver-not-worki
 """
 
 from datetime import date
-from time import sleep
 import logging
 
-from selenium import webdriver 
 from bs4 import BeautifulSoup as BS
 
 from scraping.data_structures.story import Story
@@ -25,19 +24,15 @@ logger = logging.getLogger(__name__)
 class CnnScraper(BaseScraper): 
     def __init__(self, selenium_endpoint=AppConfig.SELENIUM_ENDPOINT):
         super(CnnScraper, self).__init__(selenium_endpoint=selenium_endpoint)
-        self._selenium_endpoint = selenium_endpoint
 
     def run(self, dynamo_endpoint=None):
+        """
+        Scrape stories, validate, and write to database
+        """
         homepage_stories = self.scrape_stories_from_homepage()
         homepage_stories = self.set_source_to_cnn(homepage_stories)
         homepage_stories = self.set_date_to_today(homepage_stories)
-        logger.info('homepage_stories:\n')
-        for s in homepage_stories:
-            logger.info(f'\n\n{s.dump()}')
-        validated_stories = self.validate_stories(homepage_stories)
-        logger.info('validated_stories:\n')
-        for s in validated_stories:
-            logger.info(f'\n\n{s.dump()}')
+        validated_stories = StoryValidator().validate_stories(homepage_stories)
         response = DynamoClient(endpoint=dynamo_endpoint).put_stories(validated_stories)
         return response
 
@@ -64,15 +59,14 @@ class CnnScraper(BaseScraper):
         stories = [] 
         
         for section in homepage_sections: 
-            partial_stories = self.scrape_urllink_headlines(html, section)
-            stories = [] 
+            partial_stories = self.scrape_urllink_linkheadlines(html, section)
             for partial_story in partial_stories: 
-                story = self.populate_articletext_headline_from_url(partial_story)
+                story = self.populate_articletext_articleheadline_from_url(partial_story)
                 stories.append(story)
 
         return stories 
 
-    def scrape_urllink_headlines(self, 
+    def scrape_urllink_linkheadlines(self, 
                         page_html,
                         class_name, 
                         html_type='section',
@@ -144,7 +138,7 @@ class CnnScraper(BaseScraper):
 
         return url
     
-    def populate_articletext_headline_from_url(self, story):
+    def populate_articletext_articleheadline_from_url(self, story):
         """
         Populate article_text and article_headline fields of Story from url field
 
@@ -168,8 +162,8 @@ class CnnScraper(BaseScraper):
         if html is None: 
             logger.warning(f'Static scrape failed with url={url}')
             return None, None
-        article_headline = self._find_articleheadline_in_page_html(html)#soup.find('h1', {'class': 'pg-headline'}).getText()
-        article_text = self._find_articletext_in_page_html(html)#soup.find('section', {'class': 'zn-body-text'}).getText()
+        article_headline = self._find_articleheadline_in_page_html(html)
+        article_text = self._find_articletext_in_page_html(html)
 
         return article_headline, article_text
     
@@ -209,19 +203,3 @@ class CnnScraper(BaseScraper):
         for story in stories:
             story.date = str(date.today())
         return stories
-
-    def validate_stories(self, stories):
-        """
-        Apply final data validations before writing to database
-        """
-        validated_stories = []
-
-        for story in stories:
-            story_dump = StoryValidator().dump(story)
-            errors = StoryValidator().validate(story_dump)
-            if len(errors) == 0:
-                validated_stories.append(story)
-            else:
-                logger.info(f'errors are {errors}')
-
-        return validated_stories

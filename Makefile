@@ -52,3 +52,9 @@ run-sandbox:
 
 run-setup:
 	docker-compose --profile setup up
+
+build:
+	docker-compose -f docker-compose.yml build
+
+run: build
+	docker-compose -f docker-compose.yml up

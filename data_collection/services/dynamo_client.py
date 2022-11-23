@@ -34,6 +34,22 @@ class DynamoClient:
         """
         Batch write items
         """
+        if len(items) == 1:
+            dynamodb = boto3.resource('dynamodb', endpoint_url=DynamoConfig.DYNAMO_ENDPOINT)
+            table = dynamodb.Table('stories')
+            table.put_item(Item=items[0])
+            quit()
+        
+        dynamodb = boto3.resource('dynamodb', endpoint_url=DynamoConfig.DYNAMO_ENDPOINT)
+        table = dynamodb.Table('stories')
+        with table.batch_writer() as batch:
+            for item in items:
+                try:
+                    batch.put_item(Item=item)
+                except Exception as err:
+                    logger.error(f'put failed: {item}')
+        quit()
+
         with self.get_table(table_name=table_name).batch_writer() as batch:
             for item in items: 
                 logger.info(f'putting item:\n{item}')
