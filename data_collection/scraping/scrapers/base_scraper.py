@@ -1,11 +1,25 @@
 from time import sleep
 from selenium import webdriver
-from settings import ScraperConfig
+from settings import CnnScraperConfig
+
+import logging 
+import requests
+
+logger = logging.getLogger(__name__)
 
 class BaseScraper:
-    def __init__(self, selenium_endpoint=ScraperConfig.SELENIUM_ENDPOINT):
+    def __init__(self, selenium_endpoint=None):
+        if selenium_endpoint is None: 
+            logger.error('SELENIUM_ENDPOINT argument not provided to Base Scraper')
         self._selenium_endpoint = selenium_endpoint
-        self._driver = self._initialize_selenium_webdriver()
+    """
+    @property
+    def driver(self):
+        return self._driver
+    """
+    @property
+    def selenium_endpoint(self):
+        return self._selenium_endpoint
 
     def _initialize_selenium_webdriver(self):
         """
@@ -21,23 +35,25 @@ class BaseScraper:
 
     def scrape_rendered_html(self, url):
         """
-        Scrape the rendered html from the specified url
+        Uses Selenium
         """
-        self._driver.get(url)
-        return self._driver.page_source
-
-        # Set options for webdriver 
-        #options = webdriver.ChromeOptions()
-        #options.add_argument('--headless')
-        #options.add_argument('--no-sandbox')
-        #options.add_argument('--disable-dev-shm-usage')
-
-        #driver = webdriver.Remote(ScraperConfig.SELENIUM_ENDPOINT, options=options)
-
-        # Fetch and render page, waiting in case rendering takes a moment
-        # driver.get(url)
-        # sleep(5)
-        # rendered_html = driver.page_source 
-        # driver.quit()
-        # return rendered_html
-        
+        driver = self._initialize_selenium_webdriver()
+        driver.get(url)
+        html = str(driver.page_source)
+        driver.quit()
+        return html
+    
+    def scrape_static_html(self, url):
+        """
+        Scrapes html using `requests` package - returns None if operation fails
+        """
+        try:
+            response = requests.get(url)
+        except ConnectionError as err: 
+            logger.warning(f'requests.get(url) failed to connect with url={url}')
+            return None
+        except Exception as err:
+            logger.error(f'requests.get(url) failed with url={url}\nerr={err}')
+            return None
+        html = response.text
+        return html

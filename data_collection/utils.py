@@ -2,44 +2,34 @@
 Utility functions, such as getting all records from a table and returning 
 them as a pandas dataframe 
 """
+import os
+import logging 
+import argparse
+from settings import AppConfig
 
-import boto3 
-import pandas as pd 
+logger = logging.getLogger('utils')
 
-def get_table_as_df(table_name):
+def set_env_var_defaults():
     """
-    Get all items from given Dynamodb table and return as pandas dataframe
+    Set environment variable defaults
     """
-    dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table(table_name) 
+    for env_var_name, env_var_val in AppConfig.ENVIRONMENT_VARIABLE_DEFAULTS.items():
+        os.environ[env_var_name] = env_var_val 
+        logger.info(f'setting env var {env_var_name} to {env_var_val} == {os.environ[env_var_name]}')
 
-    lastEvaluatedKey = None 
-    items = [] 
-
-    while True: 
-        if lastEvaluatedKey == None: 
-            response = table.scan() 
-        else: 
-            response = table.scan(ExclusiveStartKey=lastEvaluatedKey)
-
-        items.extend(response['Items'])
-
-        if 'LastEvaluatedKey' in response: 
-            lastEvaluatedKey = response['LastEvaluatedKey']
-        else: 
-            break 
-
-    return pd.DataFrame(items) 
-
-def split_by_source(df):
+def parse_cmd_line_args_to_env_vars():
     """
-    Return a list of dictionaries mapping source string to df subset of that 
-    source 
+    Parse command line arguments to environment variables
     """
-    results = {} 
-    sources = df.source.unique()
+    parser = argparse.ArgumentParser()
 
-    for source in sources:
-        results[source] = df.loc[df.source == source]
+    # Add all arguments here
+    parser.add_argument('-se', '--SELENIUM_ENDPOINT')
 
-    return results 
+    # Parse to environment variables
+    args = parser.parse_args()
+    args_dict = vars(args) 
+    for env_var_name, env_var_val in args_dict.items():
+        if env_var_val is not None:
+            os.environ[env_var_name] = env_var_val
+        logger.debug(f'${env_var_name} = {os.environ[env_var_name]}') 

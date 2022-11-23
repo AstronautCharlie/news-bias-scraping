@@ -1,4 +1,5 @@
+boto3
 bs4
+marshmallow
 requests-html
 selenium
-#webdriver-manager

@@ -12,8 +12,6 @@ services:
     profiles: ["backend"]
     ports: 
     - "5000:5000"
-    networks: 
-      - bias-network
     environment: 
       - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY
       - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
@@ -28,71 +26,80 @@ services:
     profiles: ["data"]
     ports: 
       - "5002:5000"
+    environment:
+      - AWS_ACCESS_KEY_ID=abc
+      - AWS_SECRET_ACCESS_KEY=xyz
+      - AWS_DEFAULT_REGION=us-east-2
     depends_on: 
       - selenium
+      - localstack-dynamodb
+    networks:
+      - bias-network
+
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    profiles: ["dynamodb", "data"]
+    ports:
+      - "5100:5100"
+    environment:
+      DYNAMO_ENDPOINT: "http://localstack-dynamodb:4566"
+      AWS_REGION: us-east-2
+      AWS_ACCESS_KEY_ID: abc
+      AWS_SECRET_ACCESS_KEY: xyz
+      PORT: 5100
+    networks:
+      - bias-network
+    depends_on:
+      - localstack-dynamodb
   
+  localstack-dynamodb:
+    container_name: "localstack-dynamodb"
+    profiles: ["dynamodb", "data"]
+    image: localstack/localstack
+    ports: 
+      - "4566:4566"
+    environment:
+      SERVICES: dynamodb
+      AWS_ACCESS_KEY_ID: abc
+      AWS_SECRET_ACCESS_KEY: xyz
+      AWS_REGION: us-east-2
+    networks:
+      - bias-network
+  
+  setup-resources:
+    container_name: setup-resources
+    image: amazon/aws-cli
+    profiles: ["dynamodb", "data", "setup"]
+    entrypoint: /bin/sh -c
+    environment:
+      AWS_REGION: us-east-2
+      AWS_ACCESS_KEY_ID: abc
+      AWS_SECRET_ACCESS_KEY: xyz
+    networks:
+      - bias-network
+    command: >
+      "
+        sleep 10
+        cd /setup_resources
+        ./create_story_table.sh > /dev/null && \
+        echo AWS resources created!
+      "
+    depends_on:
+     - localstack-dynamodb
+    volumes:
+      - ./data_collection/setup_resources:/setup_resources
+
   selenium:
     container_name: selenium
     image: selenium/standalone-chrome
     profiles: ["data"]
     ports: 
     - "4444:4444"
-
-  # dynamo_db: 
-  #   container_name: dynamo_db
-  #   image: localstack/localstack
-  #   environment: 
-  #     - SERVICES=dynamodb
-  #     - DEFAULT_REGION=us-east-1
-  #     - DOCKER_HOST=unix:///var/run/docker.sock
-  #     - DATA_DIR=${DATA_DIR- }
-  #     - PORT_WEB_UI=${PORT_WEb_UI-8080}
-  #   ports: 
-  #     - "5010:4566"
-  #     - "${PORT_WEB_UI-8080}:${PORT_WEB_UI-8080}"
-  #   profiles: ["backend", "dynamo_db"]
-  #   networks: 
-  #     - bias-network 
+    logging:
+      driver: none
+    networks:
+     - bias-network
   
-  # dynamo_admin: 
-  #   container_name: dynamo_admin 
-  #   image: "aaronshaf/dynamodb-admin"
-  #   environment: 
-  #     DYNAMO_ENDPOINT: http://dynamo_db:4566
-  #     PORT: 5100
-  #     DYNAMO_REGION: us-east-1
-  #     AWS_ACCESS_KEY_ID: "abc"
-  #     AWS_SECRET_ACCESS_KEY: "xyz"
-  #   ports: 
-  #     - "5100:5100"
-  #   profiles: ["backend", "dynamo_db"]
-  #   depends_on: 
-  #     - dynamo_db
-  #   networks: 
-  #     - bias-network 
-  
-  # setup_resources: 
-  #   container_name: setup_resources
-  #   image: amazon/aws-cli
-  #   profiles: ["backend", "dynamo_db"]
-  #   entrypoint: /bin/sh -c 
-  #   environment: 
-  #     - AWS_DEFAULT_REGION=us-east-1
-  #     - AWS_ACCESS_KEY_ID=abc
-  #     - AWS_SECRET_ACCESS_KEY=xyz
-  #   command: >
-  #     "
-  #       sleep 10
-  #       cd /setup_resources
-  #       chmod +x setup_dev_table.sh
-  #       ./setup_dev_table.sh
-  #     "
-  #   volumes:
-  #     - ./backend/setup_resources:/setup_resources
-  #   depends_on:
-  #     - dynamo_db
-  #   networks: 
-  #     - bias-network
 
 networks: 
   bias-network:
