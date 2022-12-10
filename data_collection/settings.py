@@ -21,3 +21,6 @@ class CnnScraperConfig:
         'zn-homepage2-zone-1',
         'zn-homepage2-zone-2', 
     ]
+
+class FoxScraperConfig:
+    FOX_HOMEPAGE = 'https://www.foxnews.com'

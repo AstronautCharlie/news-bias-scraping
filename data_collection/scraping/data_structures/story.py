@@ -21,7 +21,7 @@ class Story:
         return self.__dict__
 
     def __str__(self):
-        if len(self.article_text) == 0: 
+        if self.article_text is None:
             article_snippet = ''
         else:
             article_snippet = self.article_text[:(min(50, len(self.article_text)))]

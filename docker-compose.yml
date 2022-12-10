@@ -100,7 +100,6 @@ services:
     networks:
      - bias-network
   
-
 networks: 
   bias-network:
     name: bias-network 

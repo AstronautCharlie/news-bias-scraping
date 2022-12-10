@@ -30,10 +30,11 @@ class CnnScraper(BaseScraper):
         Scrape stories, validate, and write to database
         """
         homepage_stories = self.scrape_stories_from_homepage()
-        homepage_stories = self.set_source_to_cnn(homepage_stories)
-        homepage_stories = self.set_date_to_today(homepage_stories)
         validated_stories = StoryValidator().validate_stories(homepage_stories)
-        response = DynamoClient(endpoint=dynamo_endpoint).put_stories(validated_stories)
+        if dynamo_endpoint:
+            response = DynamoClient(endpoint=dynamo_endpoint).put_stories(validated_stories)
+        else:
+            response = DynamoClient().put_stories(validated_stories)
         return response
 
     def scrape_stories_from_homepage(self):
@@ -43,9 +44,10 @@ class CnnScraper(BaseScraper):
         Return list of Stories
         """
         html = self.scrape_rendered_html(CnnScraperConfig.CNN_HOMEPAGE)
-        story_items = self.extract_homepage_stories_from_html(html)
-        
-        return story_items
+        stories = self.extract_homepage_stories_from_html(html)
+        stories = self.set_source_to_cnn(stories)
+        stories = self.set_date_to_today(stories)
+        return stories
 
     def extract_homepage_stories_from_html(self, html):
         """
