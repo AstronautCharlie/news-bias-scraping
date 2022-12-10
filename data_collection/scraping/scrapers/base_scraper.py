@@ -1,6 +1,5 @@
 from time import sleep
 from selenium import webdriver
-from settings import CnnScraperConfig
 
 import logging 
 import requests
@@ -9,9 +8,8 @@ logger = logging.getLogger(__name__)
 
 class BaseScraper:
     def __init__(self, selenium_endpoint=None):
-        if selenium_endpoint is None: 
-            logger.error('SELENIUM_ENDPOINT argument not provided to Base Scraper')
         self._selenium_endpoint = selenium_endpoint
+
     """
     @property
     def driver(self):
@@ -37,6 +35,10 @@ class BaseScraper:
         """
         Uses Selenium
         """
+        if self._selenium_endpoint is None: 
+            raise ValueError(f'Cannot scraper rendered HTML with SELENIUM_ENDPOINT set to None.\
+                Value is {self._selenium_endpoint}')
+
         driver = self._initialize_selenium_webdriver()
         driver.get(url)
         html = str(driver.page_source)
