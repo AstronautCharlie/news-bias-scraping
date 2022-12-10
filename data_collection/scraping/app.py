@@ -9,10 +9,12 @@ logger = logging.getLogger(__name__)
 
 class App:
     def run(self):
+        logger.info(f'Starting CNN Scraper...')
         cnn_scraper = CnnScraper(selenium_endpoint=AppConfig.SELENIUM_ENDPOINT)
         response = cnn_scraper.run()
         logger.info(f'CNN Scraper finished with response {response}')
 
+        logger.info(f'Starting Fox Scraper...')
         fox_scraper = FoxScraper(selenium_endpoint=AppConfig.SELENIUM_ENDPOINT)
         response = fox_scraper.run()
         logger.info(f'Fox Scraper finished with response {response}')

@@ -9,8 +9,14 @@ class AppConfig:
 
     LOGGING_LEVEL = logging.INFO
 
+    # Wait to let Selenium container spin up properly
+    STARTUP_TIMER = 15
+
 class DynamoConfig:
-    DYNAMO_ENDPOINT = 'http://localstack-dynamodb:4566'
+    # Local dev
+    #DYNAMO_ENDPOINT = 'http://localstack-dynamodb:4566'
+    # Writing to cloud
+    DYNAMO_ENDPOINT = 'http://dynamodb.us-east-2.amazonaws.com'
     TABLE_NAME = 'stories'
     
 class CnnScraperConfig: 

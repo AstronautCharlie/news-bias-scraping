@@ -41,7 +41,7 @@ class FoxScraper(BaseScraper):
         return story_list
 
     def _scrape_urls_linkheadlines_into_partial_stories(self, html):
-        fox_soup = BS(html)
+        fox_soup = BS(html, features='lxml')
         homepage_content = fox_soup.find('main', {'class': 'main-content'})
         homepage_collections = homepage_content.find_all('div', {'class': 'collection'})
         homepage_articles = self._collections_to_articles(homepage_collections)
