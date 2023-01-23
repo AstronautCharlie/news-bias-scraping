@@ -1,19 +1,20 @@
-# News Bias 
+# News Bias Scrapers
 
-## What is this? 
-`data_collection` - handles generating data. Scrapes news sources and puts data into DynamoDB. Currently pulls homepage stories from CNN and Fox News. 
-`backend` - processes requests from `frontend`
+# What does this do? 
+Scrapes stories from cnn.com and foxnews.com and writes them to DynamoDB
 
-## What's Next?
-- Frontend to handle user requests
+# How do I run this? 
+## Environment Variables
+`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`: 
+If writing to cloud - set to values in AWS console. If not, no need to set 
 
-## Need More Docs? 
-See READMEs in subfolders
+## Code changes
+`settings.py`, #switches section at top
 
-## Trouble Shooting
-- Is Docker Desktop Up? If you see this, maybe not:
+## Run containers
 ```
-ConnectionRefusedError: [WinError 10061] No connection could be made because the target machine actively
-refused it
+make data-collection
 ```
-- Is Selenium running? Is the Docker Container up? 
+
+# What's next to do? 
+This works locally - scrapes from CNN and Fox and writes to DynamoDB just fine. Next is to deploy it to ECS and set it to run every hour. 
