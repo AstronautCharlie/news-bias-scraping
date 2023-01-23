@@ -13,4 +13,8 @@ if __name__ == '__main__':
         logger.info(f'Sleeping for {startup_timer} before startup to let Selenium spin up')
         sleep(startup_timer)
     app = App()
-    app.run()    
+    
+    while True:
+        app.run()
+        logger.info(f'Scrape completed. Sleeping for {AppConfig.POLL_TIMER}')
+        sleep(AppConfig.POLL_TIMER)

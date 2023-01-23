@@ -1,25 +1,20 @@
-# Data
-This folder holds all code responsible for generating data for the service.
+# News Bias Scrapers
 
-# What does it do? 
-For now, it:
-- scrapes Fox and CNN Homepages (see `scraping/scrapers/cnn_scraper.py` and `scraping/scrapers/fox_scraper.py`)
-
-Next it will: 
-- write to AWS
+# What does this do? 
+Scrapes stories from cnn.com and foxnews.com and writes them to DynamoDB
 
 # How do I run this? 
 ## Environment Variables
 `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`: 
-If running locally - i.e., using `localstack-dynamodb` instead of actually writing to AWS - set to `abc`, `xyz`, `us-east-2` respectively
-If writing to cloud - set to values in AWS console
+If writing to cloud - set to values in AWS console. If not, no need to set 
 
 ## Code changes
-`settings.py`
-If running locally, `DYNAMO_ENDPOINT=http://localstack-dynamodb:4566`. 
-If writing to cloud, `DYNAMO_ENDPOINT=dynamodb.us-east-2.amazonaws.com`
+`settings.py`, #switches section at top
 
 ## Run containers
 ```
 make data-collection
 ```
+
+# What's next to do? 
+This works locally - scrapes from CNN and Fox and writes to DynamoDB just fine. Next is to deploy it to ECS and set it to run every hour. 

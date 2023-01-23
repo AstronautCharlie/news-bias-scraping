@@ -6,12 +6,12 @@ from scraping.scrapers.base_scraper import BaseScraper
 from scraping.data_structures.story import Story
 from services.dynamo_client import DynamoClient
 from services.validators import StoryValidator
-from settings import AppConfig, FoxScraperConfig
+from settings import FoxScraperConfig as Config
 
 logger = logging.getLogger(__name__)
 
 class FoxScraper(BaseScraper):
-    def __init__(self, selenium_endpoint=AppConfig.SELENIUM_ENDPOINT):
+    def __init__(self, selenium_endpoint=Config.SELENIUM_ENDPOINT):
         super(FoxScraper, self).__init__(selenium_endpoint=selenium_endpoint)
 
     def run(self, dynamo_endpoint=None):
@@ -24,7 +24,7 @@ class FoxScraper(BaseScraper):
         return response
 
     def scrape_stories_from_homepage(self):
-        html = self.scrape_static_html(FoxScraperConfig.FOX_HOMEPAGE)
+        html = self.scrape_static_html(Config.FOX_HOMEPAGE)
         stories = self._scrape_urls_linkheadlines_into_partial_stories(html)
         stories = self.set_source_to_fox(stories)
         stories = self.set_date_to_today(stories)
@@ -88,7 +88,7 @@ class FoxScraper(BaseScraper):
 
     def _scrape_headline_text_from_article_url(self, url):
         html = self.scrape_static_html(url)
-        fox_soup = BS(html)
+        fox_soup = BS(html, features='lxml')
         
         first_headline = fox_soup.find('h1', {'class': 'headline'})
         sub_headline = fox_soup.find('h2', {'class': 'sub-headline'})

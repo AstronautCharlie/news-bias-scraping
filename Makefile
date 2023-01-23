@@ -1,37 +1,19 @@
 # Runs and Builds
 
-build-backend: 
-	docker-compose --profile backend build 
-
-run-backend: 
-	docker-compose --profile backend up 
-
-build-dynamodb:
-	docker-compose --profile dynamo_db build 
-
-build-data: # selenium and scraper
-	docker-compose --profile data build
-
-run-data:
-	docker-compose --profile data up
-
-build-selenium:
-	docker-compose build selenium
-
-run-selenium:
-	docker-compose up selenium
-
-build-data-collection:
+build-data-collection: # scraper and selenium
 	docker-compose --profile data build
 
 data-collection: build-data-collection
 	docker-compose --profile data up
 
-data-collector: build-data-collector
+data-collector: build-data-collection
 	docker-compose up -d data-collection
 
 run-localstack:
 	docker-compose up -d localstack
+
+build-dynamodb:
+	docker-compose --profile dynamo_db build 
 
 dynamodb: build-dynamodb
 	docker-compose --profile dynamodb up
@@ -58,3 +40,6 @@ build:
 
 run: build
 	docker-compose -f docker-compose.yml up
+
+run-selenium:
+	docker-compose up selenium

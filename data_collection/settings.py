@@ -4,19 +4,25 @@ All customizable settings for data collection should go here
 import argparse
 import logging
 
+# Switches
+RUN_LOCALLY = False # if anything other than True, will write to AWS
+
 class AppConfig:
     SELENIUM_ENDPOINT = 'http://selenium:4444/wd/hub'
 
     LOGGING_LEVEL = logging.INFO
 
     # Wait to let Selenium container spin up properly
-    STARTUP_TIMER = 15
+    STARTUP_TIMER = 90
+
+    POLL_TIMER = 60 * 60 # Once an hour
 
 class DynamoConfig:
-    # Local dev
-    #DYNAMO_ENDPOINT = 'http://localstack-dynamodb:4566'
-    # Writing to cloud
-    DYNAMO_ENDPOINT = 'http://dynamodb.us-east-2.amazonaws.com'
+    if RUN_LOCALLY:
+        DYNAMO_ENDPOINT = 'http://localstack-dynamodb:4566'
+    else:
+        DYNAMO_ENDPOINT = 'http://dynamodb.us-east-2.amazonaws.com'
+
     TABLE_NAME = 'stories'
     
 class CnnScraperConfig: 
@@ -28,5 +34,9 @@ class CnnScraperConfig:
         'zn-homepage2-zone-2', 
     ]
 
+    SELENIUM_ENDPOINT = AppConfig.SELENIUM_ENDPOINT
+
 class FoxScraperConfig:
     FOX_HOMEPAGE = 'https://www.foxnews.com'
+
+    SELENIUM_ENDPOINT = AppConfig.SELENIUM_ENDPOINT

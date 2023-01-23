@@ -17,12 +17,12 @@ from scraping.data_structures.story import Story
 from scraping.scrapers.base_scraper import BaseScraper
 from services.dynamo_client import DynamoClient
 from services.validators import StoryValidator
-from settings import CnnScraperConfig, AppConfig
+from settings import CnnScraperConfig as Config
 
 logger = logging.getLogger(__name__)
 
 class CnnScraper(BaseScraper): 
-    def __init__(self, selenium_endpoint=AppConfig.SELENIUM_ENDPOINT):
+    def __init__(self, selenium_endpoint=Config.SELENIUM_ENDPOINT):
         super(CnnScraper, self).__init__(selenium_endpoint=selenium_endpoint)
 
     def run(self, dynamo_endpoint=None):
@@ -43,7 +43,7 @@ class CnnScraper(BaseScraper):
 
         Return list of Stories
         """
-        html = self.scrape_rendered_html(CnnScraperConfig.CNN_HOMEPAGE)
+        html = self.scrape_rendered_html(Config.CNN_HOMEPAGE)
         stories = self.extract_homepage_stories_from_html(html)
         stories = self.set_source_to_cnn(stories)
         stories = self.set_date_to_today(stories)
@@ -56,7 +56,7 @@ class CnnScraper(BaseScraper):
         Return list of Stories
         """
         # List of sections on the CNN homepage that contain links to scrape
-        homepage_sections = CnnScraperConfig.CNN_HOMEPAGE_SECTIONS
+        homepage_sections = Config.CNN_HOMEPAGE_SECTIONS
 
         stories = [] 
         
