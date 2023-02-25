@@ -20,4 +20,4 @@ class App:
         start_time = time.time()
         fox_scraper = FoxScraper(selenium_endpoint=AppConfig.SELENIUM_ENDPOINT)
         response = fox_scraper.run()
-        logger.info(f'Fox Scraper finished with response {response}')
+        logger.info(f'Fox Scraper finished. Runtime = {time.time() - start_time} seconds')
