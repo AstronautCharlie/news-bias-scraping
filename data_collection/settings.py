@@ -5,10 +5,13 @@ import argparse
 import logging
 
 # Switches
-RUN_LOCALLY = False # if anything other than True, will write to AWS
+RUN_LOCALLY = False 
 
 class AppConfig:
-    SELENIUM_ENDPOINT = 'http://selenium:4444/wd/hub'
+    if RUN_LOCALLY:
+        SELENIUM_ENDPOINT = 'http://selenium:4444/wd/hub'
+    else:
+        SELENIUM_ENDPOINT = 'http://localhost:4444/wd/hub'
 
     LOGGING_LEVEL = logging.INFO
 
@@ -23,7 +26,7 @@ class DynamoConfig:
     else:
         DYNAMO_ENDPOINT = 'http://dynamodb.us-east-2.amazonaws.com'
 
-    TABLE_NAME = 'stories'
+    TABLE_NAME = 'raw_stories'
     
 class CnnScraperConfig: 
     CNN_HOMEPAGE = 'https://www.cnn.com'

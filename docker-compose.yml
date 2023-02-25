@@ -1,24 +1,4 @@
 services: 
-
-  backend-shell: 
-    container_name: backend-shell 
-    build: ./backend 
-    entrypoint: bash -c 
-    profiles: ["backend"]
-
-  backend: 
-    container_name: backend 
-    build: ./backend 
-    profiles: ["backend"]
-    ports: 
-    - "5000:5000"
-    environment: 
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-abc}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-xyz}
-      - AWS_DEFAULT_REGION=us-east-2
-    volumes: 
-      - .:/code
-      - C:\Users\trevo\.aws\credentials:/app/.aws/credentials:ro
   
   data-collection:
     container_name: data-collection
@@ -30,8 +10,6 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-abc}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-xyz}
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-2}
-    networks:
-      - bias-network
 
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin
@@ -44,8 +22,6 @@ services:
       AWS_ACCESS_KEY_ID: abc
       AWS_SECRET_ACCESS_KEY: xyz
       PORT: 5100
-    networks:
-      - bias-network
     depends_on:
       - localstack-dynamodb
   
@@ -60,8 +36,6 @@ services:
       AWS_ACCESS_KEY_ID: abc
       AWS_SECRET_ACCESS_KEY: xyz
       AWS_REGION: us-east-2
-    networks:
-      - bias-network
   
   setup-resources:
     container_name: setup-resources
@@ -72,8 +46,6 @@ services:
       AWS_REGION: us-east-2
       AWS_ACCESS_KEY_ID: abc
       AWS_SECRET_ACCESS_KEY: xyz
-    networks:
-      - bias-network
     command: >
       "
         sleep 10
@@ -94,9 +66,4 @@ services:
     - "4444:4444"
     logging:
       driver: none
-    networks:
-     - bias-network
-  
-networks: 
-  bias-network:
-    name: bias-network 
+

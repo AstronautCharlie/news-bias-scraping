@@ -18,3 +18,12 @@ make data-collection
 
 # What's next to do? 
 This works locally - scrapes from CNN and Fox and writes to DynamoDB just fine. Next is to deploy it to ECS and set it to run every hour. 
+
+# TroubleShooting
+### Error
+```
+botocore.exceptions.ClientError: An error occurred (UnrecognizedClientException) when calling the BatchWriteItem operation: The security token included in the request is invalid.
+```
+
+### Fixes
+Make sure environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are set to the appropriate values.

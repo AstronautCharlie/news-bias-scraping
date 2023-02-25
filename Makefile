@@ -1,3 +1,7 @@
+# Main method
+run: 
+	make data-collection
+
 # Runs and Builds
 
 build-data-collection: # scraper and selenium
@@ -37,9 +41,6 @@ run-setup:
 
 build:
 	docker-compose -f docker-compose.yml build
-
-run: build
-	docker-compose -f docker-compose.yml up
 
 run-selenium:
 	docker-compose up selenium

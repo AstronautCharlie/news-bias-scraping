@@ -14,7 +14,5 @@ if __name__ == '__main__':
         sleep(startup_timer)
     app = App()
     
-    while True:
-        app.run()
-        logger.info(f'Scrape completed. Sleeping for {AppConfig.POLL_TIMER}')
-        sleep(AppConfig.POLL_TIMER)
+    app.run()
+    logger.info(f'Scrape completed. Goodbye :)')
