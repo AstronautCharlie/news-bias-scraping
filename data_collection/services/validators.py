@@ -2,7 +2,6 @@ from marshmallow import Schema, fields, validates, ValidationError
 
 import logging
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('validator')
 
 class StoryValidator(Schema):
@@ -18,7 +17,7 @@ class StoryValidator(Schema):
         if article_text is None or article_text == '': 
             raise ValidationError(f'Article text is empty')
 
-    def validate_stories(self, stories):
+    def filter_valid_stories(self, stories):
         """
         Pick out the valid stories from the given list and return them. Handle any errors
         """

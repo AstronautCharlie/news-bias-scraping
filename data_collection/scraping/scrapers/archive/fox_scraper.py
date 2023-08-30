@@ -1,3 +1,19 @@
+"""
+This class defines a web scraper to scrape stories from the fox news 
+homepage. At time of writing (2023-08-13) the stories are stored in the 
+following html containers:
+- `main` object with `class=main-content`, of which there are two
+    - `main_content-primary`, which should have priority 1
+    - `main_content-secondary`, which should have priority 2
+- `section` object with `class=collection-section`, of which there are 28
+    - each of these have priority 3
+
+Within these objects, each story is held in an `article` object. Each article comes
+with a picture, and both the picture and the text of the headline have a link. The
+text of the headline is held in the `div` object with `class=info`. Within that, 
+get the <a> tag and extract the url and headline.  
+"""
+
 from datetime import date
 import logging
 from bs4 import BeautifulSoup as BS
@@ -11,12 +27,15 @@ from settings import FoxScraperConfig as Config
 logger = logging.getLogger(__name__)
 
 class FoxScraper(BaseScraper):
+
     def __init__(self, selenium_endpoint=Config.SELENIUM_ENDPOINT):
         super(FoxScraper, self).__init__(selenium_endpoint=selenium_endpoint)
 
     def run(self, dynamo_endpoint=None):
         homepage_stories = self.scrape_stories_from_homepage()
+        logging.error(f'scraped {len(homepage_stories)} from fox')
         validated_stories = StoryValidator().validate_stories(homepage_stories)
+        logging.error(f'got {len(validated_stories)} valid stories from scrape')
         if dynamo_endpoint:
             response = DynamoClient(endpoint=dynamo_endpoint).put_stories(validated_stories)
         else:
@@ -26,6 +45,7 @@ class FoxScraper(BaseScraper):
     def scrape_stories_from_homepage(self):
         html = self.scrape_static_html(Config.FOX_HOMEPAGE)
         stories = self._scrape_urls_linkheadlines_into_partial_stories(html)
+        logging.error(f'scraped {len(stories)} from html')
         stories = self.set_source_to_fox(stories)
         stories = self.set_date_to_today(stories)
         return stories
@@ -42,11 +62,14 @@ class FoxScraper(BaseScraper):
 
     def _scrape_urls_linkheadlines_into_partial_stories(self, html):
         fox_soup = BS(html, features='lxml')
-        homepage_content = fox_soup.find('main', {'class': 'main-content'})
-        homepage_collections = homepage_content.find_all('div', {'class': 'collection'})
-        homepage_articles = self._collections_to_articles(homepage_collections)
+
+        homepage_content = fox_soup.find_all('main', {'class': 'main-content'})
         partial_stories = self._articles_soup_to_partial_stories(homepage_articles)
         partial_stories = self._fill_article_fields_from_partial_stories(partial_stories)
+
+        homepage_collections = homepage_content.find_all('div', {'class': 'collection'})
+        homepage_articles = self._collections_to_articles(homepage_collections)
+
         return partial_stories
 
     def _collections_to_articles(self, collections):

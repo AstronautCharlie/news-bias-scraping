@@ -6,5 +6,5 @@ secrets.txt
 data_collection/__pycache__
 data_collection/scraping/scrapers/__pycache__
 sandbox
-
+venv
 __pycache__

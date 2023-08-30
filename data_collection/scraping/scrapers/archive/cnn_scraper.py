@@ -13,7 +13,7 @@ import logging
 
 from bs4 import BeautifulSoup as BS
 
-from scraping.data_structures.story import Story
+from data_structures.story import Story
 from scraping.scrapers.base_scraper import BaseScraper
 from services.dynamo_client import DynamoClient
 from services.validators import StoryValidator
@@ -147,7 +147,7 @@ class CnnScraper(BaseScraper):
         Returns Story
         """
         if story.url is None: 
-            logging.error('Story url is undefined - cannot populate article')
+            logging.info('Story url is undefined - cannot populate article')
             return story
         article_headline, article_text = self.scrape_articleheadline_text_from_url(story.url)
         story.article_headline = article_headline

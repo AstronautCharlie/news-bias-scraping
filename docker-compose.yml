@@ -10,6 +10,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-abc}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-xyz}
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-2}
+      - RUN_LOCALLY=${RUN_LOCALLY:-False}
 
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin
@@ -60,7 +61,8 @@ services:
 
   selenium:
     container_name: selenium
-    image: selenium/standalone-chrome
+    image: selenium/standalone-chrome:4.10.0
+    #image: selenium/standalone-edge:4.9.0
     profiles: ["data", "data_collection_prod"]
     ports: 
     - "4444:4444"

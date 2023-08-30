@@ -10,9 +10,6 @@ build-data-collection: # scraper and selenium
 data-collection: build-data-collection
 	docker-compose --profile data up
 
-data-collector: build-data-collection
-	docker-compose up -d data-collection
-
 run-localstack:
 	docker-compose up -d localstack
 
@@ -27,8 +24,12 @@ dynamodb: build-dynamodb
 clean: 
 	docker-compose down --remove-orphans
 
-test: clean
-	docker-compose run --rm backend_shell 'python3.9 -m pytest'
+# test: clean run-selenium
+# 	timeout 15
+# 	cd data_collection
+# 	python -m pytest
+# 	docker kill selenium 
+# 	docker rm selenium
 
 build-sandbox: 
 	docker-compose build sandbox
@@ -44,3 +45,6 @@ build:
 
 run-selenium:
 	docker-compose up selenium
+
+test: 
+	pytest . -vv

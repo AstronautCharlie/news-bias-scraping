@@ -2,8 +2,10 @@ import logging
 from time import sleep
 from scraping.app import App
 from settings import AppConfig
+import os 
 
-logging.basicConfig(level=AppConfig.LOGGING_LEVEL)
+
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':

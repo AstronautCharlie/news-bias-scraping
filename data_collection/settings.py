@@ -3,9 +3,10 @@ All customizable settings for data collection should go here
 """
 import argparse
 import logging
+import os
 
 # Switches
-RUN_LOCALLY = False 
+RUN_LOCALLY = False
 
 class AppConfig:
     if RUN_LOCALLY:
@@ -16,7 +17,7 @@ class AppConfig:
     LOGGING_LEVEL = logging.INFO
 
     # Wait to let Selenium container spin up properly
-    STARTUP_TIMER = 90
+    STARTUP_TIMER = 30
 
     POLL_TIMER = 60 * 60 # Once an hour
 
